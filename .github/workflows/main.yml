@@ -1,0 +1,33 @@
+name: Deploy to Multiple cPanels
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to cPanels
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        cpanel:
+          - name: CPANEL1
+            ftp-server: ${{ secrets.CPANEL1_FTP_SERVER }}
+            ftp-username: ${{ secrets.CPANEL1_FTP_USERNAME }}
+            ftp-password: ${{ secrets.CPANEL1_FTP_PASSWORD }}
+          - name: CPANEL2
+            ftp-server: ${{ secrets.CPANEL2_FTP_SERVER }}
+            ftp-username: ${{ secrets.CPANEL2_FTP_USERNAME }}
+            ftp-password: ${{ secrets.CPANEL2_FTP_PASSWORD }}
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.1.0
+
+      - name: FTP Deploy to ${{ matrix.cpanel.name }}
+        uses: SamKirkland/FTP-Deploy-Action@3.1.1
+        with:
+          ftp-server: ${{ matrix.cpanel.ftp-server }}
+          ftp-username: ${{ matrix.cpanel.ftp-username }}
+          ftp-password: ${{ matrix.cpanel.ftp-password }}
